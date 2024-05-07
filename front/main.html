@@ -58,12 +58,16 @@
             color: #0F2027;
             box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
         }
+
+        #checkout {
+            background: #f9ebd4;
+        }
         .items input {
             height: 16px;
             width: 16px;
         }
         #run {
-            margin-top: 100px;
+            margin-top: 50px;
             height: 50px;
             width: 190px;
             font-size: 24px;
@@ -91,14 +95,6 @@
     <div class="main">
         <h1>Checkout Browser</h1>
         <div class="datas">
-            <h3>Cookies</h3>
-            <textarea id="cookies" type="text"></textarea>
-        </div>
-        <div class="datas">
-            <h3>User-Agent</h3>
-            <input id="user_agent" type="text">
-        </div>
-        <div class="datas">
             <h3>Checkout link</h3>
             <input id="checkout" type="text">
         </div>
@@ -106,16 +102,23 @@
             <h3>Proxy</h3>
             <input id="proxy" type="text">
         </div>
+        <div class="datas">
+            <h3>User-Agent</h3>
+            <input id="user_agent" type="text">
+        </div>
+        <div class="datas">
+            <h3>Cookies</h3>
+            <textarea id="cookies" type="text"></textarea>
+        </div>
 
         <button id="run" class="disabled"></button>
         <div id="info"></div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script type="text/javascript">
-       function checkInputs(cookiesInput, userAgentInput, link, proxy) {
+       function checkInputs(link) {
             let button = document.querySelector('#run')
-            if (cookiesInput !== '' && userAgentInput !== ''
-                && link !== '' && proxy !== '') {
+            if (link !== '') {
                 document.getElementById('run').classList.remove('disabled');
                 document.getElementById('run').classList.add('active');
                 button.innerHTML = 'Start'
@@ -152,17 +155,10 @@
         let proxyInput = document.getElementById('proxy')
 
         function handleInput() {
-            let cookies = textarea.value
-            let userAgent = input.value;
             let checkout = checkoutInput.value
-            let proxy = proxyInput.value
-            checkInputs(cookies, userAgent, checkout, proxy);
+            checkInputs(checkout);
         }
-
-        textarea.addEventListener('input', handleInput);
-        input.addEventListener('input', handleInput);
         checkoutInput.addEventListener('input', handleInput);
-        proxyInput.addEventListener('input', handleInput);
     </script>
 </body>
 </html>

@@ -77,7 +77,7 @@ class ProxyExtension:
         shutil.rmtree(self._dir)
 
 
-def selenium_connect(user_agent, cookie_string, link, proxy):
+def selenium_connect(link, proxy='', user_agent='', cookie_string=''):
     options = webdriver.ChromeOptions()
     options.add_argument("--start-maximized")
     #options.add_argument("--incognito")
@@ -87,7 +87,7 @@ def selenium_connect(user_agent, cookie_string, link, proxy):
     options.add_argument("--disable-site-isolation-trials")
     options.add_argument('--ignore-certificate-errors')
     options.add_argument('--lang=EN')
-    options.add_argument(f'--user-agent={user_agent}')
+    if user_agent: options.add_argument(f'--user-agent={user_agent}')
     if proxy:
         proxy = proxy.split(":", 3)
         proxy[1] = int(proxy[1])
@@ -103,15 +103,18 @@ def selenium_connect(user_agent, cookie_string, link, proxy):
             enable_cdp_events=True
         )
     except: driver.quit()
-    parsed_url = urlparse(link)
-    main_domain = parsed_url.scheme + "://" + parsed_url.netloc
-    print(main_domain)
-    driver.get(main_domain)
+    
     # Convert cookie string to dictionary
-    cookie_string = ast.literal_eval(cookie_string)
-    for cookie in cookie_string:
-        print(cookie)
-        driver.add_cookie(cookie)
+    if cookie_string:
+        parsed_url = urlparse(link)
+        cookie_string = ast.literal_eval(cookie_string)
+        main_domain = parsed_url.scheme + "://" + cookie_string[0]['domain'].split('.', 1)[1]
+        print(main_domain)
+        driver.get(main_domain)
+        
+        for cookie in cookie_string:
+            print(cookie)
+            driver.add_cookie(cookie)
 
     return driver
 
@@ -128,7 +131,7 @@ def read_file():
 
 @eel.expose
 def main(user_agent, cookies, link, proxy):
-    driver = selenium_connect(user_agent, cookies, link, proxy)
+    driver = selenium_connect(link, proxy, user_agent, cookies)
     driver.get(link)
     input('Once you finished, click here to close browser')
     driver.quit()
