@@ -1,27 +1,22 @@
 @echo off
-setlocal
 
-REM Path to your Python interpreter
-set PYTHON=python
+set "project_dir=..\checkout-browser-main"
+set "venv_dir=%project_dir%"
 
-REM Name of your virtual environment directory
-set VENV_DIR=venv
+rem Create virtual environment
+python -m venv "%venv_dir%"
 
-REM Check if the virtual environment already exists
-if not exist %VENV_DIR% (
-    echo Creating virtual environment...
-    %PYTHON% -m venv %VENV_DIR%
-)
+rem Activate virtual environment
+call "%venv_dir%\Scripts\activate"
 
-REM Activate the virtual environment
-call %VENV_DIR%\Scripts\activate
+rem Navigate back to the working directory
+cd /d "%~dp0"
 
-REM Install requirements from requirements.txt
-echo Installing requirements...
-pip install -r requirements.txt
+rem Install requirements
+pip install -r "%project_dir%\requirements.txt"
 
-REM Deactivate the virtual environment
+rem Deactivate virtual environment
 deactivate
 
-echo Requirements installation completed.
+echo Installation complete.
 pause

@@ -1,5 +1,5 @@
 import undetected_chromedriver as webdriver
-import os
+import os, sys
 import ast
 from urllib.parse import urlparse
 import eel
@@ -98,7 +98,9 @@ def selenium_connect(link, proxy='', user_agent='', cookie_string=''):
     print(user_agent)
     if user_agent: options.add_argument(f'--user-agent={user_agent}')
     cwd= os.getcwd()
-    extension = cwd + "/uBlock-Origin"
+    slash = "\\" if sys.platform == "win32" else "/"
+    directory_name = cwd + slash + "uBlock-Origin"
+    extension = os.path.join(cwd, directory_name)
     print(extension)
     if proxy:
         proxy = proxy.split(":", 3)
