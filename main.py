@@ -5,6 +5,14 @@ from urllib.parse import urlparse
 import eel
 import tempfile
 import shutil
+from selenium.webdriver.common.by import By
+import undetected_chromedriver as webdriver
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 
 class ProxyExtension:
     manifest_json = """
@@ -87,13 +95,19 @@ def selenium_connect(link, proxy='', user_agent='', cookie_string=''):
     options.add_argument("--disable-site-isolation-trials")
     options.add_argument('--ignore-certificate-errors')
     options.add_argument('--lang=EN')
+    print(user_agent)
     if user_agent: options.add_argument(f'--user-agent={user_agent}')
+    cwd= os.getcwd()
+    extension = cwd + "/uBlock-Origin"
+    print(extension)
     if proxy:
         proxy = proxy.split(":", 3)
         proxy[1] = int(proxy[1])
+        print(proxy)
         proxy_extension = ProxyExtension(*proxy)
-        options.add_argument(f"--load-extension={proxy_extension.directory}")
-    
+        options.add_argument(f"--load-extension={proxy_extension.directory},{extension}")
+    else: options.add_argument(f"--load-extension={extension}")
+
     prefs = {"credentials_enable_service": False,
         "profile.password_manager_enabled": False}
     options.add_experimental_option("prefs", prefs)
@@ -129,13 +143,29 @@ def read_file():
         data[label] = value
     return data
 
+
+def check_for_element(driver, selector, click=False, xpath=False):
+    try:
+        if xpath:
+            element = driver.find_element(By.XPATH, selector)
+        else:
+            element = driver.find_element(By.CSS_SELECTOR, selector)
+        if click: 
+            driver.execute_script("arguments[0].scrollIntoView();", element)
+            element.click()
+        return element
+    except: return False
+
+
 @eel.expose
 def main(user_agent, cookies, link, proxy):
     driver = selenium_connect(link, proxy, user_agent, cookies)
     driver.get(link)
-    input('Once you finished, click here to close browser')
+    try:
+        check_for_element(driver, "//button[contains(@class, 'sc-aitciz-1') and contains(@class, 'hWHZkc')][2]", xpath=True, click=True)
+    except: print("did not manage to click on 'Find seats for me'")
+    input('Enter to quit()')
     driver.quit()
-    
 
 if __name__ == '__main__':
     # data = read_file()
